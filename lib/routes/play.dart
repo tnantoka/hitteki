@@ -19,43 +19,9 @@ class Play extends PositionComponent
   Future onLoad() async {
     super.onLoad();
 
-    await add(
-      _ball = Ball(
-        position: Vector2(
-          game.contentArea.size.x * 0.5 - 30,
-          game.contentArea.size.y * 0.5 - 30,
-        ),
-      ),
-    );
-
-    await add(
-      Wall(
-        position: Vector2(0, 0),
-        size: Vector2(game.contentArea.size.x, 10),
-        bounceDirection: WallBounceDirection.vertical,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(0, game.contentArea.size.y - 10),
-        size: Vector2(game.contentArea.size.x, 10),
-        bounceDirection: WallBounceDirection.vertical,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(0, 0),
-        size: Vector2(10, game.contentArea.size.y),
-        bounceDirection: WallBounceDirection.horizontal,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(game.contentArea.size.x, 0),
-        size: Vector2(10, game.contentArea.size.y),
-        bounceDirection: WallBounceDirection.horizontal,
-      ),
-    );
+    await _addBall();
+    await _addWalls();
+    await _addTargets();
   }
 
   @override
@@ -116,5 +82,89 @@ class Play extends PositionComponent
 
     _dragStartPosition = null;
     _dragEndPosition = null;
+  }
+
+  Future _addBall() async {
+    await add(
+      _ball = Ball(
+        radius: 30,
+        position: Vector2(
+          game.contentArea.size.x * 0.5 - 30,
+          game.contentArea.size.y * 0.7 - 30,
+        ),
+      ),
+    );
+  }
+
+  Future _addWalls() async {
+    await add(
+      Wall(
+        position: Vector2(0, 0),
+        size: Vector2(game.contentArea.size.x, 10),
+        bounceDirection: WallBounceDirection.vertical,
+      ),
+    );
+    await add(
+      Wall(
+        position: Vector2(0, game.contentArea.size.y - 10),
+        size: Vector2(game.contentArea.size.x, 10),
+        bounceDirection: WallBounceDirection.vertical,
+      ),
+    );
+    await add(
+      Wall(
+        position: Vector2(0, 0),
+        size: Vector2(10, game.contentArea.size.y),
+        bounceDirection: WallBounceDirection.horizontal,
+      ),
+    );
+    await add(
+      Wall(
+        position: Vector2(game.contentArea.size.x, 0),
+        size: Vector2(10, game.contentArea.size.y),
+        bounceDirection: WallBounceDirection.horizontal,
+      ),
+    );
+  }
+
+  Future _addTargets() async {
+    final length = game.contentArea.size.x / 11;
+
+    for (final i in [0, 8]) {
+      await add(
+        Target(
+          position: Vector2(
+            length * i,
+            0,
+          ),
+          size: Vector2(length * 3, length),
+          score: 1,
+        ),
+      );
+    }
+
+    for (final i in [3, 6]) {
+      await add(
+        Target(
+          position: Vector2(
+            length * i,
+            0,
+          ),
+          size: Vector2(length * 2, length),
+          score: 2,
+        ),
+      );
+    }
+
+    await add(
+      Target(
+        position: Vector2(
+          length * 5,
+          0,
+        ),
+        size: Vector2(length, length),
+        score: 3,
+      ),
+    );
   }
 }

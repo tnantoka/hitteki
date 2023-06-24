@@ -5,12 +5,15 @@ import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 
 import 'wall.dart';
+import 'target.dart';
+import '../main_game.dart';
 
-class Ball extends CircleComponent with CollisionCallbacks {
+class Ball extends CircleComponent
+    with CollisionCallbacks, HasGameRef<MainGame> {
   Ball({
     super.position,
+    super.radius,
   }) : super(
-          radius: 30,
           paint: BasicPalette.white.paint(),
         );
 
@@ -92,6 +95,10 @@ class Ball extends CircleComponent with CollisionCallbacks {
       } else {
         _vy *= -1;
       }
+    } else if (other is Target) {
+      game.score += other.score;
+      _vy *= -1;
+      other.removeFromParent();
     }
   }
 
