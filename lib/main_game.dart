@@ -1,10 +1,16 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 
-class MainGame extends FlameGame {
-  final _contentArea = RectangleComponent(
+import 'routes/routes.dart';
+
+class MainGame extends FlameGame with HasCollisionDetection {
+  var score = 0;
+
+  late final RouterComponent router;
+
+  final contentArea = RectangleComponent(
     size: Vector2(375, 667),
     paint: BasicPalette.black.paint(),
   );
@@ -13,15 +19,27 @@ class MainGame extends FlameGame {
   Future onLoad() async {
     super.onLoad();
 
-    await add(_contentArea);
+    debugMode = true;
+
+    await add(contentArea);
+
+    router = RouterComponent(
+      routes: {
+        'home': Route(Home.new),
+        'play': Route(Play.new),
+        'result': Route(Result.new),
+      },
+      initialRoute: 'home',
+    );
+    await contentArea.add(router);
   }
 
   @override
   void onGameResize(Vector2 size) {
-    final scale = size.y / _contentArea.size.y;
-    _contentArea.scale = Vector2.all(scale);
-    _contentArea.position =
-        Vector2(size.x * 0.5 - _contentArea.size.x * 0.5 * scale, 0);
+    final scale = size.y / contentArea.size.y;
+    contentArea.scale = Vector2.all(scale);
+    contentArea.position =
+        Vector2(size.x * 0.5 - contentArea.size.x * 0.5 * scale, 0);
     super.onGameResize(size);
   }
 
