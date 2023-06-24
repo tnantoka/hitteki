@@ -6,12 +6,14 @@ import 'package:flutter/material.dart' hide Route;
 import 'routes/routes.dart';
 
 class MainGame extends FlameGame with HasCollisionDetection {
+  static final contentSize = Vector2(375, 667);
+
   var score = 0;
 
   late final RouterComponent router;
 
   final contentArea = RectangleComponent(
-    size: Vector2(375, 667),
+    size: MainGame.contentSize,
     paint: BasicPalette.black.paint(),
   );
 

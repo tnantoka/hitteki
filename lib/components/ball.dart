@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
@@ -12,8 +14,11 @@ class Ball extends CircleComponent with CollisionCallbacks {
           paint: BasicPalette.white.paint(),
         );
 
-  var vx = 0.0;
-  var vy = 0.0;
+  var _vx = 0.0;
+  var _vy = 0.0;
+  var _elapsedTime = 0.0;
+
+  Vector2? _hitPower;
 
   @override
   Future onLoad() async {
@@ -26,7 +31,55 @@ class Ball extends CircleComponent with CollisionCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    position += Vector2(vx, vy) * dt;
+    position += Vector2(_vx, _vy) * dt;
+
+    _elapsedTime += dt;
+    if (_elapsedTime > 0.2) {
+      _elapsedTime = 0;
+      _vx *= 0.96;
+      _vy *= 0.96;
+    }
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+
+    final origin = Offset(radius, radius);
+
+    if (_hitPower != null) {
+      canvas.drawLine(
+        origin,
+        origin - _hitPower!.toOffset(),
+        BasicPalette.white.paint()..strokeWidth = 2,
+      );
+
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: origin - _hitPower!.toOffset(),
+          width: 8,
+          height: 8,
+        ),
+        BasicPalette.white.paint()..strokeWidth = 2,
+      );
+
+      canvas.drawLine(
+        origin,
+        origin + _hitPower!.toOffset(),
+        BasicPalette.white.paint()..strokeWidth = 2,
+      );
+
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: origin + _hitPower!.toOffset(),
+          width: 24,
+          height: 24,
+        ),
+        BasicPalette.white.paint()
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+    }
   }
 
   @override
@@ -34,8 +87,20 @@ class Ball extends CircleComponent with CollisionCallbacks {
     super.onCollision(intersectionPoints, other);
 
     if (other is Wall) {
-      vx *= -1;
-      vy *= -1;
+      if (other.bounceDirection == WallBounceDirection.horizontal) {
+        _vx *= -1;
+      } else {
+        _vy *= -1;
+      }
     }
+  }
+
+  void hit(double vx, double vy) {
+    _vx += vx;
+    _vy += vy;
+  }
+
+  void charge(Vector2? power) {
+    _hitPower = power;
   }
 }
