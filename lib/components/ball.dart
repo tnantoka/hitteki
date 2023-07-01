@@ -13,15 +13,20 @@ class Ball extends CircleComponent
   Ball({
     super.position,
     super.radius,
+    required this.onHit,
   }) : super(
           paint: BasicPalette.white.paint(),
         );
+
+  final VoidCallback onHit;
 
   var _vx = 0.0;
   var _vy = 0.0;
   var _elapsedTime = 0.0;
 
   Vector2? _hitPower;
+
+  bool get isMoving => _vx != 0 || _vy != 0;
 
   @override
   Future onLoad() async {
@@ -97,8 +102,10 @@ class Ball extends CircleComponent
       }
     } else if (other is Target) {
       game.score += other.score;
-      _vy *= -1;
+      _vx = 30;
+      _vy = 30;
       other.removeFromParent();
+      onHit();
     }
   }
 

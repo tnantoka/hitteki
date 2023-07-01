@@ -1,3 +1,3 @@
 export 'ball.dart';
-export 'wall.dart';
+export 'stage.dart';
 export 'target.dart';

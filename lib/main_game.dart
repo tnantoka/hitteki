@@ -28,7 +28,7 @@ class MainGame extends FlameGame with HasCollisionDetection {
     router = RouterComponent(
       routes: {
         'home': Route(Home.new),
-        'play': Route(Play.new),
+        'play': Route(Play.new, maintainState: false),
         'result': Route(Result.new),
       },
       initialRoute: 'home',

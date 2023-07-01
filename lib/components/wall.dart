@@ -14,6 +14,7 @@ class Wall extends RectangleComponent {
     required this.bounceDirection,
   }) : super(
           paint: BasicPalette.white.paint(),
+          priority: 1,
         );
 
   final WallBounceDirection bounceDirection;

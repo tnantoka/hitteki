@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
+import 'package:flame/palette.dart';
 
 import '../main_game.dart';
 import '../components/components.dart';
@@ -11,6 +13,7 @@ class Play extends PositionComponent
   Play() : super(size: MainGame.contentSize);
 
   late final Ball _ball;
+  late final Stage _stage;
 
   Vector2? _dragStartPosition;
   Vector2? _dragEndPosition;
@@ -19,14 +22,19 @@ class Play extends PositionComponent
   Future onLoad() async {
     super.onLoad();
 
+    await _addStage();
     await _addBall();
-    await _addWalls();
     await _addTargets();
-  }
 
-  @override
-  void onMount() {
-    super.onMount();
+    await _stage.add(
+      MoveEffect.to(
+        Vector2(
+          0,
+          -_stage.size.y * 0.5,
+        ),
+        EffectController(duration: 1.0, startDelay: 3.0),
+      ),
+    );
   }
 
   @override
@@ -37,6 +45,18 @@ class Play extends PositionComponent
       _ball.charge(_dragEndPosition! - _dragStartPosition!);
     } else {
       _ball.charge(null);
+    }
+
+    if (_ball.isMoving) {
+      final initialBallY = _stage.size.y * 0.7 - _ball.radius;
+      final initialStageY = -_stage.size.y * 0.5;
+      var y = initialStageY - (_ball.position.y - initialBallY);
+      if (y > 0) {
+        y = 0;
+      } else if (y < initialStageY) {
+        y = initialStageY;
+      }
+      _stage.position.y = y;
     }
   }
 
@@ -84,54 +104,42 @@ class Play extends PositionComponent
     _dragEndPosition = null;
   }
 
-  Future _addBall() async {
+  Future _addStage() async {
     await add(
-      _ball = Ball(
-        radius: 30,
-        position: Vector2(
-          game.contentArea.size.x * 0.5 - 30,
-          game.contentArea.size.y * 0.7 - 30,
+      _stage = Stage(
+        size: Vector2(
+          game.contentArea.size.x,
+          game.contentArea.size.y * 2,
         ),
       ),
     );
   }
 
-  Future _addWalls() async {
-    await add(
-      Wall(
-        position: Vector2(0, 0),
-        size: Vector2(game.contentArea.size.x, 10),
-        bounceDirection: WallBounceDirection.vertical,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(0, game.contentArea.size.y - 10),
-        size: Vector2(game.contentArea.size.x, 10),
-        bounceDirection: WallBounceDirection.vertical,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(0, 0),
-        size: Vector2(10, game.contentArea.size.y),
-        bounceDirection: WallBounceDirection.horizontal,
-      ),
-    );
-    await add(
-      Wall(
-        position: Vector2(game.contentArea.size.x, 0),
-        size: Vector2(10, game.contentArea.size.y),
-        bounceDirection: WallBounceDirection.horizontal,
+  Future _addBall() async {
+    await _stage.add(
+      _ball = Ball(
+        radius: 20,
+        position: Vector2(
+          _stage.size.x * 0.5 - 20,
+          _stage.size.y * 0.8 - 20,
+        ),
+        onHit: () {
+          Future.delayed(
+            const Duration(milliseconds: 3000),
+            () {
+              game.router.pushReplacementNamed('result');
+            },
+          );
+        },
       ),
     );
   }
 
   Future _addTargets() async {
-    final length = game.contentArea.size.x / 11;
+    final length = _stage.size.x / 11;
 
     for (final i in [0, 8]) {
-      await add(
+      await _stage.add(
         Target(
           position: Vector2(
             length * i,
@@ -139,12 +147,13 @@ class Play extends PositionComponent
           ),
           size: Vector2(length * 3, length),
           score: 1,
+          paint: BasicPalette.darkGray.paint(),
         ),
       );
     }
 
     for (final i in [3, 6]) {
-      await add(
+      await _stage.add(
         Target(
           position: Vector2(
             length * i,
@@ -152,11 +161,12 @@ class Play extends PositionComponent
           ),
           size: Vector2(length * 2, length),
           score: 2,
+          paint: BasicPalette.gray.paint(),
         ),
       );
     }
 
-    await add(
+    await _stage.add(
       Target(
         position: Vector2(
           length * 5,
@@ -164,6 +174,7 @@ class Play extends PositionComponent
         ),
         size: Vector2(length, length),
         score: 3,
+        paint: BasicPalette.white.paint(),
       ),
     );
   }

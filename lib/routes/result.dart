@@ -33,7 +33,10 @@ class Result extends Component with HasGameRef<MainGame> {
 
     await add(
       ButtonComponent(
-        onPressed: () => game.router.pushReplacementNamed('home'),
+        onPressed: () {
+          game.score = 0;
+          game.router.pushReplacementNamed('home');
+        },
         button: TextComponent(
           text: 'Tap to Back',
           textRenderer: TextPaint(
