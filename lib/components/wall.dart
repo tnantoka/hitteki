@@ -13,7 +13,7 @@ class Wall extends RectangleComponent {
     super.size,
     required this.bounceDirection,
   }) : super(
-          paint: BasicPalette.white.paint(),
+          paint: BasicPalette.transparent.paint(),
           priority: 1,
         );
 

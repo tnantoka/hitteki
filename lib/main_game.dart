@@ -21,7 +21,7 @@ class MainGame extends FlameGame with HasCollisionDetection {
   Future onLoad() async {
     super.onLoad();
 
-    debugMode = true;
+    // debugMode = true;
 
     await add(contentArea);
 

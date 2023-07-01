@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
+import 'package:flutter/material.dart';
 
 import '../main_game.dart';
 import '../components/components.dart';
@@ -138,44 +139,41 @@ class Play extends PositionComponent
   Future _addTargets() async {
     final length = _stage.size.x / 11;
 
-    for (final i in [0, 8]) {
-      await _stage.add(
-        Target(
-          position: Vector2(
-            length * i,
-            0,
-          ),
-          size: Vector2(length * 3, length),
-          score: 1,
-          paint: BasicPalette.darkGray.paint(),
-        ),
+    final targets = <Target>[];
+
+    for (var i = 0; i < 5; i++) {
+      final size = Vector2.all(length);
+      var score = 2;
+      var palette = BasicPalette.red;
+      if (i > 2) {
+        size.x = length * 3;
+        score = 1;
+        palette = BasicPalette.yellow;
+      } else if (i > 0) {
+        size.x = length * 2;
+        score = 2;
+        palette = BasicPalette.orange;
+      }
+
+      final target = Target(
+        position: Vector2.zero(),
+        size: size,
+        score: score,
+        paint: palette.paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4,
       );
+
+      targets.add(target);
+      await _stage.add(target);
     }
 
-    for (final i in [3, 6]) {
-      await _stage.add(
-        Target(
-          position: Vector2(
-            length * i,
-            0,
-          ),
-          size: Vector2(length * 2, length),
-          score: 2,
-          paint: BasicPalette.gray.paint(),
-        ),
-      );
-    }
+    targets.shuffle();
 
-    await _stage.add(
-      Target(
-        position: Vector2(
-          length * 5,
-          0,
-        ),
-        size: Vector2(length, length),
-        score: 3,
-        paint: BasicPalette.white.paint(),
-      ),
-    );
+    for (var i = 1; i < targets.length; i++) {
+      final target = targets[i];
+      final prevTarget = targets[i - 1];
+      target.position.x = prevTarget.position.x + prevTarget.size.x;
+    }
   }
 }

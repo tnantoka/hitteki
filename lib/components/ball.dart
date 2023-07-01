@@ -15,7 +15,9 @@ class Ball extends CircleComponent
     super.radius,
     required this.onHit,
   }) : super(
-          paint: BasicPalette.white.paint(),
+          paint: BasicPalette.white.paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 4,
         );
 
   final VoidCallback onHit;
@@ -56,6 +58,12 @@ class Ball extends CircleComponent
     final origin = Offset(radius, radius);
 
     if (_hitPower != null) {
+      canvas.drawCircle(
+        origin,
+        4,
+        BasicPalette.white.paint(),
+      );
+
       canvas.drawLine(
         origin,
         origin - _hitPower!.toOffset(),
@@ -80,6 +88,26 @@ class Ball extends CircleComponent
       canvas.drawRect(
         Rect.fromCenter(
           center: origin + _hitPower!.toOffset(),
+          width: 24,
+          height: 24,
+        ),
+        BasicPalette.white.paint()
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+    } else {
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: origin,
+          width: 8,
+          height: 8,
+        ),
+        BasicPalette.white.paint()..strokeWidth = 2,
+      );
+
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: origin,
           width: 24,
           height: 24,
         ),
