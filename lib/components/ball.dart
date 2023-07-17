@@ -55,6 +55,10 @@ class Ball extends CircleComponent
   void render(Canvas canvas) {
     super.render(canvas);
 
+    if (isMoving) {
+      return;
+    }
+
     final origin = Offset(radius, radius);
 
     if (_hitPower != null) {
@@ -82,6 +86,15 @@ class Ball extends CircleComponent
       canvas.drawLine(
         origin,
         origin + _hitPower!.toOffset(),
+        BasicPalette.white.paint()..strokeWidth = 2,
+      );
+
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: origin + _hitPower!.toOffset(),
+          width: 8,
+          height: 8,
+        ),
         BasicPalette.white.paint()..strokeWidth = 2,
       );
 
